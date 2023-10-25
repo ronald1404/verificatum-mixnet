@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Create the info files with vmni
+. .conf
+
+echo "Making Election..."
+
+vmni -prot \
+-sid "SessionId" \
+-name "Swedish Election" \
+-nopart $NOPART \
+-thres $THRESHOLD \
+-pgroup '$PGROUP' # set group as multiplicative groups modulo primes
+
+echo "Creating partys..."
+vmni -party -name "Mix Server 1" stub.xml privInfo.xml localProtInfo.xml
+vmni -party -name "Mix Server 2" stub.xml privInfo2.xml protInfo2.xml
+vmni -party -name "Mix Server 3" stub.xml privInfo3.xml protInfo3.xml
+
+# Create a file with all parameters of others protocol info files
+echo "making merge..."
+vmni -merge localProtInfo.xml protInfo2.xml protInfo3.xml protInfo.xml
+
