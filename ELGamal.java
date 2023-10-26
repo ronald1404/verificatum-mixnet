@@ -1,4 +1,4 @@
-/*
+/* https://lume.ufrgs.br/bitstream/handle/10183/208458/Poster_63698.pdf?sequence=2
  * Main
  */
 
@@ -38,6 +38,8 @@ public class Main{
         
 
         // for Alice send message K to Bob
+        // she should partite the message in block 1 and block 2
+        // M=281
         int  message_K = 281813;
 
     }
