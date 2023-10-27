@@ -1,46 +1,39 @@
-/* https://lume.ufrgs.br/bitstream/handle/10183/208458/Poster_63698.pdf?sequence=2
- * Main
- */
+import java.math.*;
+import java.util.*;
+import java.security.*;
+import java.io.*;
 
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.Random;
+public class ELGamal {
+    public static void main(String[] args) throws IOException {
+        BigInteger p, b, c, secretKey;
+        secretKey = new BigInteger("13");
 
-public class Main{
-    public static void main(String[] args){
-    
-        BigInteger p, r, x, y, a, b;
+        // public key
 
-        p = new BigInteger("1009"); 
-        r = new BigInteger("11");
-        x = new BigInteger("13"); // private key B
-        y = new BigInteger("69"); // private key A
+        p = BigInteger.probablePrime(64, new SecureRandom());
+        b = new BigInteger("3");
+        c = b.modPow(secretKey, p);
 
-        
-        b = r.modPow(x, p); // b = (r^x) mod p
-        System.out.println(b);
+        System.out.println("\npublic key (p,b,c) = ("+p+","+b+","+c+")");
 
-        //public key B
-        BigInteger B[] = new BigInteger[3];
-        B[0] = p;
-        B[1] = r;
-        B[2] = b;
-        
-        a = r.modPow(y, p); // a = (r^y) mod p
-        System.out.println(a);
+        // Encryption
+        String message = "123456";
+        BigInteger X = new BigInteger(message);
+        BigInteger r = new BigInteger(64, new SecureRandom()); // secret key r
+        BigInteger K = X.multiply(c.modPow(r, p)).mod(p); // X*(c^r) mod p
+        BigInteger B = b.modPow(r, p);
 
-        // public key A
-        BigInteger A[] = new BigInteger[3];
-        A[0] = p;
-        A[1] = r;
-        A[2] = a;
+        System.out.println("Plaintext = " + X);
+        System.out.println("(K,B) = ("+K+","+B+")");
 
-        
+        // Decryption
+        BigInteger crmodp = B.modPow(secretKey, p); // (((b^r)modp)^(secretkey)mod p)
+        BigInteger d = crmodp.modInverse(p); // d^(⁻1) mod p
+        BigInteger message_decodes = d.multiply(K).mod(p);
 
-        // for Alice send message K to Bob
-        // she should partite the message in block 1 and block 2
-        // M=281
-        int  message_K = 281813;
+        System.out.println("(d,crmodp) = ("+d+","+crmodp+")");
+        System.out.println("Alice decodes: " + message_decodes);
 
     }
 }
+// reference: https://lume.ufrgs.br/bitstream/handle/10183/208458/Poster_63698.pdf?sequence=2
