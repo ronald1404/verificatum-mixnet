@@ -25,7 +25,14 @@ vmn -keygen privInfo.xml protInfo.xml publicKey
 echo "generating demo ciphs"
 vmnd -ciphs publicKey 10 ciphertexts
 
-echo ""
+echo "Mixing"
 vmn -mix privInfo.xml protInfo.xml ciphertexts plaintexts
 
+echo "converting bin files to json files"
+vmnc -pkey -outi json protInfo.xml publicKey publicKeyJson
+vmnc -ciphs -outi json protInfo.xml ciphertexts ciphertextsJson
+vmnc -plain -outi json protInfo.xml plaintexts plaintextsJson
 
+vmnc -pkey -outi native protInfo.xml publicKey publicKeyNative
+vmnc -ciphs -outi native protInfo.xml ciphertexts ciphertextsNative
+vmnc -plain -outi native protInfo.xml plaintexts plaintextsNative
