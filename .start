@@ -1,15 +1,31 @@
 #!/bin/bash
 
+CORRECTNESS=noninteractive
+PRG=SHA-256
 PGROUP=$(vog -gen ModPGroup -fixed 1024)
 
-vmni -prot -name "Civis Election" \
--sid "SessionId" -nopart 1 -thres 1 #-pgroup PGROUP
+echo "Creating Session..."
 
-vmni -party -name "MixServer 1" stub.xml \
-privInfo.xml protInfo.xml
+vmni -prot \
+-sid 'MyDemo' \
+-name 'Swedish Election' \
+-nopart 1 \
+-thres 1 \
+-corr $CORRECTNESS \
+-prg $PRG \
+-pgroup "$PGROUP"
 
+
+echo "Creating Mix Servers"
+vmni -party -name "MixServer 1" stub.xml privInfo.xml protInfo.xml
+
+echo "Generating public key"
 vmn -keygen privInfo.xml protInfo.xml publicKey
 
+echo "generating demo ciphs"
 vmnd -ciphs publicKey 10 ciphertexts
 
+echo ""
 vmn -mix privInfo.xml protInfo.xml ciphertexts plaintexts
+
+
