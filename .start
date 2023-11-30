@@ -1,38 +1,41 @@
 #!/bin/bash
 
-CORRECTNESS=noninteractive
-PRG=SHA-256
-PGROUP=$(vog -gen ModPGroup -fixed 1024)
+PGROUP=$(vog -gen ModPGroup -fixed 2048)
 
-echo "Creating Session..."
-
-vmni -prot \
--sid 'MyDemo' \
--name 'Swedish Election' \
--nopart 1 \
--thres 1 \
--corr $CORRECTNESS \
--prg $PRG \
--pgroup "$PGROUP"
+echo "Generating info Files"
+vmni -prot -name "Civis Election" \
+	-sid "SessionID" \
+	-nopart 1 \
+	-thres 1 \
+	-pgroup "$PGROUP"
 
 
 echo "Creating Mix Servers"
 vmni -party -name "MixServer 1" stub.xml privInfo.xml protInfo.xml
 
 echo "Generating public key"
-vmn -keygen privInfo.xml protInfo.xml publicKey
+### Use "-setpk" to only use the mix-net for shuffling using an externally generated public key.
+vmnc -pkey -ini json protInfo.xml .publicKeyJsonTest.json publicKey
+vmn -setpk privInfo.xml protInfo.xml publicKey
+
+# vmn -keygen privInfo.xml protInfo.xml publicKey
+
 
 echo "generating demo ciphs"
 vmnd -ciphs publicKey 10 ciphertexts
+# # vmnc -ciphs -ini json protInfo.xml .ciphertextJsonTest.json ciphertexts
 
 echo "Mixing"
-vmn -mix privInfo.xml protInfo.xml ciphertexts plaintexts
+### embaralhar e descriptografar as cifras de entrada, ou seja, a saída é uma lista de textos simples aleatoriamente permutados
+# vmn -mix privInfo.xml protInfo.xml ciphertexts plaintexts
+#### "Embaralhe os textos cifrados de entrada sem decifrá-los. Se a pré-computação foi usada anteriormente, então os valores pré-computados são usados para acelerar o embaralhamento."
+# vmn -shuffle privInfo.xml protInfo.xml ciphertexts ciphertextsout
 
-echo "converting bin files to json files"
-vmnc -pkey -outi json protInfo.xml publicKey publicKeyJson
-vmnc -ciphs -outi json protInfo.xml ciphertexts ciphertextsJson
-vmnc -plain -outi json protInfo.xml plaintexts plaintextsJson
+# echo "converting bin files to json files"
+# vmnc -pkey -outi json protInfo.xml publicKey publicKeyJson
+# vmnc -ciphs -outi json protInfo.xml ciphertexts ciphertextsJson
+# vmnc -plain -outi json protInfo.xml plaintexts plaintextsJson
 
-vmnc -pkey -outi native protInfo.xml publicKey publicKeyNative
-vmnc -ciphs -outi native protInfo.xml ciphertexts ciphertextsNative
-vmnc -plain -outi native protInfo.xml plaintexts plaintextsNative
+# vmnc -pkey -outi native protInfo.xml publicKey publicKeyNative
+# vmnc -ciphs -outi native protInfo.xml ciphertexts ciphertextsNative
+# vmnc -plain -outi native protInfo.xml plaintexts plaintextsNative
